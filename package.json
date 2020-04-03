@@ -24,10 +24,6 @@
   },
   "homepage": "https://github.com/shleyze/figmate#readme",
   "dependencies": {
-    "@babel/cli": "^7.8.4",
-    "@babel/core": "^7.9.0",
-    "@babel/node": "^7.8.7",
-    "@babel/runtime": "^7.9.2",
     "dotenv": "^8.2.0",
     "figma-api": "^1.5.5",
     "ink": "^2.7.1",
@@ -41,9 +37,12 @@
     "style-dictionary": "^2.8.3"
   },
   "devDependencies": {
+    "@babel/cli": "^7.8.4",
+    "@babel/core": "^7.9.0",
     "@babel/plugin-transform-runtime": "^7.9.0",
     "@babel/preset-env": "^7.9.0",
     "@babel/preset-react": "^7.9.4",
+    "@babel/runtime": "^7.9.2",
     "husky": "^4.2.3"
   },
   "husky": {
