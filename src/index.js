@@ -5,8 +5,8 @@ import {buildTokensFromDic, cleanUp, getConfig, getFigmaFile, getTokens, log, tr
 
 const isCLIEnv = require.main === module;
 
-async function figmate() {
-      const CONFIG = await getConfig();
+async function figmate(config) {
+      const CONFIG = await getConfig(config);
   const FILE = await getFigmaFile(CONFIG);
   const RAW_TOKENS = getTokens(FILE, CONFIG);
   const logTokens = render(log.tokens(RAW_TOKENS));

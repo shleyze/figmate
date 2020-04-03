@@ -10,15 +10,15 @@ The package works with  [node.js](https://nodejs.org/), so be sure that you inst
 
 You can install in two ways:
 
-**Global (prefered way)** run `npm install -g figmate`
+**Global (preferred way)** run `npm install -g figmate`
 
 **Local** run `npm install figmate --save` or `npm install figmate --save-dev`
 
 ## How to use
 
 - CLI run `figmate` in terminal
-- ES6 module `import Figmate from 'figmate'` in your .js file (node enviroment)
-
+- ES6 module `import Figmate from 'figmate'` in your .js file (node environment)
+- CommonJS module `const Figmate = require('figmate').default` in your .js file (node environment)
 ## How to configure
 
 All files should be placed your project root folder:
@@ -81,7 +81,7 @@ boards: [
 ]
 ```
 
-As a path you can specify the page or group and it's possible to be nested as you need by devider `/` 
+As a path you can specify the page or group and it's possible to be nested as you need by divider `/` 
 
 | Type         | Description                                             |
 |--------------|---------------------------------------------------------|
