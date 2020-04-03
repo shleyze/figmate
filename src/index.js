@@ -1,15 +1,7 @@
-#!/usr/bin/env babel-node
-import { render } from "ink";
+#!/usr/bin/env node
+import {render} from "ink";
 
-import {
-  getConfig,
-  getFigmaFile,
-  getTokens,
-  transformToDictionary,
-  buildTokensFromDic,
-  cleanUp,
-  log
-} from "./utils";
+import {buildTokensFromDic, cleanUp, getConfig, getFigmaFile, getTokens, log, transformToDictionary} from "./utils";
 
 const isCLIEnv = require.main === module;
 
