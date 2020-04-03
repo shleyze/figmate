@@ -1,4 +1,4 @@
-import { rgba } from "polished";
+import {rgba} from "polished";
 
 const getNode = (path, node) =>
   path.split("/").reduce((acc, currentPath) => {
@@ -81,7 +81,7 @@ const parseNode = (node, options, handler) => {
 
       // has css properties
       fills.forEach(fill => {
-        const { color, opacity } = fill;
+        const { color } = fill;
         // Check for fill style
         if (!color) {
           return;

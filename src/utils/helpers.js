@@ -1,5 +1,5 @@
-import React, { Fragment } from "react";
-import { render, Box, Color, Static } from "ink";
+import React, {Fragment} from "react";
+import {Box, Color, Static} from "ink";
 import Spinner from "ink-spinner";
 import Table from "ink-table";
 import Divider from "ink-divider";
