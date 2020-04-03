@@ -1,6 +1,6 @@
 {
   "name": "figmate",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Get design-tokens from Figma",
   "bin": "lib/index.js",
   "main": "lib/index.js",
@@ -53,7 +53,12 @@
   "babel": {
     "presets": [
       "@babel/preset-react",
-      "@babel/preset-env"
+      [
+        "@babel/preset-env",
+        {
+          "modules": "cjs"
+        }
+      ]
     ],
     "plugins": [
       "@babel/plugin-transform-runtime"

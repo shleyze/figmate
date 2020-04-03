@@ -91,5 +91,6 @@ const tokens = arr => {
 export const log = { error, loading, loaded, tokens };
 export const messages = {
   tokenNotFound: "Token is required!",
-  fileIdNotFound: "File id is required!"
+  fileIdNotFound: "File id is required!",
+  boardsAreEmpty: "Configure boards"
 };
