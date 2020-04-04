@@ -1,39 +1,32 @@
-import {rgba} from "polished";
-
-const getNode = (path, node) =>
-  path.split("/").reduce((acc, currentPath) => {
-    if (acc.children) {
-      return acc.children.find(({ name }) => name === currentPath) || {};
-    }
-
-    return {};
-  }, node);
-
-const getColorValue = color => {
-  // Convert color to web rgba format
-  color.r *= 255;
-  color.g *= 255;
-  color.b *= 255;
-
-  return rgba(
-    Math.round(color.r),
-    Math.round(color.g),
-    Math.round(color.b),
-    Math.round(color.a * 100) / 100
-  );
+const tokenTypes = {
+  "style/text": "text",
+  "style/fill": "fill",
+  "style/shadow": "DROP_SHADOW",
+  space: true,
+  radius: true,
 };
 
-const formatFontToCSS = style => {
+function getColorValue(color) {
+  // Convert color to web rgba format
+  const red = Math.round(color["r"] * 255);
+  const green = Math.round(color["g"] * 255);
+  const blue = Math.round(color["b"] * 255);
+  const alpha = Math.round(color.a * 100) / 100;
+
+  return `rgba(${red}, ${green}, ${blue}, ${alpha})`;
+}
+
+function formatFontToCSS(style) {
   const keys = Object.keys(style);
   const mapRule = {
     fontFamily: "font-family",
     fontWeight: "font-weight",
     fontSize: "font-size",
-    lineHeightPx: "line-height"
+    lineHeightPx: "line-height",
   };
 
   const rules = {};
-  keys.forEach(key => {
+  keys.forEach((key) => {
     if (mapRule[key]) {
       let value = style[key];
       if (key === "fontSize" || key === "lineHeightPx") {
@@ -44,9 +37,9 @@ const formatFontToCSS = style => {
   });
 
   return rules;
-};
+}
 
-const formatShadowToCSS = styles => {
+function formatShadowToCSS(styles) {
   const rawProperties = [].concat(styles);
   const properties = rawProperties.map(({ color, offset, radius }) => {
     const { x, y } = offset;
@@ -56,17 +49,9 @@ const formatShadowToCSS = styles => {
   });
 
   return properties.join(", ");
-};
+}
 
-const tokenTypes = {
-  "style/text": "text",
-  "style/fill": "fill",
-  "style/shadow": "DROP_SHADOW",
-  space: true,
-  radius: true
-};
-
-const parseNode = (node, options, handler) => {
+function parseNode(node, options, handler) {
   if (!node) {
     return;
   }
@@ -80,7 +65,7 @@ const parseNode = (node, options, handler) => {
       const { style, styles: styleRefs } = node;
 
       // has css properties
-      fills.forEach(fill => {
+      fills.forEach((fill) => {
         const { color } = fill;
         // Check for fill style
         if (!color) {
@@ -108,7 +93,7 @@ const parseNode = (node, options, handler) => {
               handler &&
                 handler(name, {
                   description,
-                  styles: formatFontToCSS(style)
+                  styles: formatFontToCSS(style),
                 });
             }
           }
@@ -145,7 +130,7 @@ const parseNode = (node, options, handler) => {
               handler &&
                 handler(name, {
                   description,
-                  styles: { "box-shadow": formatShadowToCSS(properties) }
+                  styles: { "box-shadow": formatShadowToCSS(properties) },
                 });
             }
           }
@@ -191,27 +176,45 @@ const parseNode = (node, options, handler) => {
   }
 
   // Travel the tree
-  node.children.forEach(childNode => {
+  node.children.forEach((childNode) => {
     parseNode(childNode, options, handler);
   });
-};
+}
 
-const getStyles = (node, options) => {
+function getStyles(node, options) {
   const list = {};
   const handler = (name, params) => (list[name] = params);
-
   parseNode(node, options, handler);
-
   return Object.entries(list).map(([name, params]) => ({ name, ...params }));
-};
+}
 
-export const getTokens = (file, config) => {
-  const { document, styles } = file;
-  const { boards } = config;
+function getNode(path, node) {
+  return path.split("/").reduce((acc, currentPath) => {
+    if (acc.children) {
+      return acc.children.find((child) => child["name"] === currentPath) || {};
+    }
+
+    return {};
+  }, node);
+}
+
+function get(FILE, CONFIG) {
+  const { document, styles } = FILE;
+  const { boards } = CONFIG;
 
   return boards
-    .map(({ path, ...restOptions }) =>
-      getStyles(getNode(path, document), { styles, ...restOptions })
-    )
-    .filter(board => board.length);
-};
+    .map((board) => {
+      const { path, type } = board;
+
+      if (!path || !type) {
+        return [];
+      }
+      const node = getNode(path, document);
+      const options = { ...board, styles };
+
+      return getStyles(node, options);
+    })
+    .filter((board) => board.length);
+}
+
+module.exports = { get };

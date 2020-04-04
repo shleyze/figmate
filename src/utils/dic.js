@@ -1,27 +1,28 @@
-import { writeFile } from "./index";
+const merge = require("lodash/merge");
+const { writeFile } = require("./files");
 
-const addCallbackActionToPlatforms = (obj, actionName) => {
+function addCallbackActionToPlatforms(obj, actionName) {
   return Object.entries(obj).reduce((acc, [key, item]) => {
     const { actions = [] } = item;
 
     acc[key] = {
       ...item,
       ...(!actions.includes(actionName) && {
-        actions: actions.concat(actionName)
-      })
+        actions: actions.concat(actionName),
+      }),
     };
 
     return acc;
   }, {});
-};
+}
 
-export async function buildTokensFromDic(dic, config) {
+async function buildTokens(dic, config) {
   const { tempFolder, platforms: defaultPlatforms } = config;
   const DIC_TEMP_FILE = `${tempFolder}/dic.json`;
 
   await writeFile(JSON.stringify(dic, null, 2), DIC_TEMP_FILE);
 
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     try {
       const callbackActionName = "callback";
       const platforms = addCallbackActionToPlatforms(
@@ -30,7 +31,7 @@ export async function buildTokensFromDic(dic, config) {
       );
       const StyleDictionary = require("style-dictionary").extend({
         source: [DIC_TEMP_FILE],
-        platforms
+        platforms,
       });
 
       // Imitate fire callback
@@ -43,17 +44,52 @@ export async function buildTokensFromDic(dic, config) {
             callbackActionCounter === Object.keys(platforms).length - 1;
 
           if (shouldFireCallback) {
-            resolve();
+            resolve([null]);
           } else {
             callbackActionCounter++;
           }
         },
-        undo: () => {}
+        undo: () => {},
       });
 
       StyleDictionary.buildAllPlatforms();
     } catch (error) {
-      reject(error);
+      resolve([error]);
     }
   });
 }
+
+function transform(arr) {
+  return arr.reduce((acc, item) => {
+    item.forEach(({ name, description, styles = {} }) => {
+      const path = name.split("/");
+      const obj = {};
+      path.reduce((acc, item, index, src) => {
+        const isLast = src.length - 1 === index;
+
+        if (isLast) {
+          acc[item] = Object.entries(styles).reduce((acc, [key, value]) => {
+            acc[key] = {
+              value,
+              ...(description && { comment: description }),
+            };
+            return acc;
+          }, {});
+        } else {
+          acc[item] = {};
+        }
+
+        return acc[item];
+      }, obj);
+
+      acc = merge(acc, obj);
+    });
+
+    return acc;
+  }, {});
+}
+
+module.exports = {
+  transform,
+  buildTokens,
+};
