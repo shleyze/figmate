@@ -1,26 +1,39 @@
 #!/usr/bin/env node
-import {render} from "ink";
+const log = require("./utils/log");
+const config = require("./utils/config");
+const figmaApi = require("./utils/figma");
+const tokens = require("./utils/tokens");
+const dic = require("./utils/dic");
+const files = require("./utils/files");
 
-import {buildTokensFromDic, cleanUp, getConfig, getFigmaFile, getTokens, log, transformToDictionary} from "./utils";
+const isCLI = require.main === module;
 
-const isCLIEnv = require.main === module;
+async function figmate(moduleConfig) {
+  let ERR, FILE;
 
-async function figmate(config) {
-      const CONFIG = await getConfig(config);
-  const FILE = await getFigmaFile(CONFIG);
-  const RAW_TOKENS = getTokens(FILE, CONFIG);
-  const logTokens = render(log.tokens(RAW_TOKENS));
+  const CONFIG = await config.get(moduleConfig);
 
-  logTokens.unmount();
-  await logTokens.waitUntilExit();
-  const DIC_TOKENS = transformToDictionary(RAW_TOKENS);
-  await buildTokensFromDic(DIC_TOKENS, CONFIG);
+  [ERR, FILE] = await figmaApi.getFile(CONFIG);
 
-  await cleanUp(CONFIG);
+  if (ERR) {
+    log.error(ERR["message"]);
+    return [ERR];
+  }
+
+  const RAW_TOKENS = tokens.get(FILE, CONFIG);
+  const DIC_TOKENS = dic.transform(RAW_TOKENS);
+  [ERR] = await dic.buildTokens(DIC_TOKENS, CONFIG);
+
+  if (ERR) {
+    log.error(ERR["message"]);
+    return [ERR];
+  }
+
+  return await files.deleteFolder(CONFIG["tempFolder"]);
 }
 
-if (isCLIEnv) {
-  figmate().catch(error => render(log.error(error)))
+if (isCLI) {
+  figmate();
 }
 
-export default figmate
+module.exports = figmate;

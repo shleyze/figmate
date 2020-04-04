@@ -1,30 +1,36 @@
-import fs from "fs";
-import path from "path";
+const fs = require("fs");
+const path = require("path");
+const rimraf = require("rimraf");
+const messages = require("./messages");
 
-export const isFileExist = path => fs.existsSync(path);
+const isFileExist = (filePath) => fs.existsSync(filePath);
 
-export const loadFile = path =>
-  new Promise(resolve => {
-    if (!path) {
-      throw new Error("Path is empty!");
-    }
-    if (!fs.existsSync(path)) {
-      throw new Error("File doesn't exist");
-    }
+async function loadFile(filePath) {
+  if (!filePath) {
+    return [new Error(messages.pathIsEmpty)];
+  }
+  if (!isFileExist(filePath)) {
+    return [new Error(messages.fileNotFound)];
+  }
 
-    fs.readFile(path, "utf8", (error, data) => {
-      if (error) throw new Error(error);
-      resolve(JSON.parse(data));
+  return new Promise((resolve) => {
+    fs.readFile(filePath, "utf8", (error, data) => {
+      if (error) {
+        return resolve([error]);
+      }
+
+      resolve([null, JSON.parse(data)]);
     });
   });
+}
 
-export async function createFolder(dir) {
+async function createFolder(dir) {
   if (!dir) return Promise.reject("Dir is required");
 
   return new Promise((resolve, reject) => {
     try {
       if (!fs.existsSync(dir)) {
-        fs.mkdir(dir, { recursive: true }, error => {
+        fs.mkdir(dir, { recursive: true }, (error) => {
           if (error) throw error;
           resolve(true);
         });
@@ -40,8 +46,8 @@ export async function createFolder(dir) {
 async function write(file, filePath) {
   return await new Promise((resolve, reject) => {
     try {
-      fs.writeFile(filePath, file, "utf-8", error => {
-        if (error) throw new Error(`${error}`);
+      fs.writeFile(filePath, file, "utf-8", (error) => {
+        if (error) throw error;
 
         resolve();
       });
@@ -51,7 +57,7 @@ async function write(file, filePath) {
   });
 }
 
-export async function writeFile(file, filePath) {
+async function writeFile(file, filePath) {
   if (!file || !filePath) {
     return Promise.reject("File, path, name are required!");
   }
@@ -59,3 +65,14 @@ export async function writeFile(file, filePath) {
   await createFolder(path.parse(filePath).dir);
   return await write(file, filePath);
 }
+
+async function deleteFolder(folderPath) {
+  return new Promise((resolve) => {
+    rimraf(folderPath, (error) => {
+      if (error) throw new Error(`${error}`);
+      resolve();
+    });
+  });
+}
+
+module.exports = { isFileExist, loadFile, writeFile, deleteFolder };

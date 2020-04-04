@@ -17,8 +17,7 @@ You can install in two ways:
 ## How to use
 
 - CLI run `figmate` in terminal
-- ES6 module `import Figmate from 'figmate'` in your .js file (node environment)
-- CommonJS module `const Figmate = require('figmate').default` in your .js file (node environment)
+- CommonJS module `const Figmate = require('figmate')` in your .js file
 ## How to configure
 
 All files should be placed your project root folder:

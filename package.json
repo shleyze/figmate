@@ -1,12 +1,16 @@
 {
   "name": "figmate",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Get design-tokens from Figma",
-  "bin": "lib/index.js",
-  "main": "lib/index.js",
+  "bin": "src/index.js",
+  "main": "src/index.js",
   "scripts": {
-    "prebuild": "npx babel src -d lib",
+    "prebuild": "eslint src/**/*.js",
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "type": "commonjs",
+  "engines": {
+    "node": ">=8.10.0"
   },
   "repository": {
     "type": "git",
@@ -24,44 +28,44 @@
   },
   "homepage": "https://github.com/shleyze/figmate#readme",
   "dependencies": {
+    "axios": "^0.19.2",
     "dotenv": "^8.2.0",
-    "figma-api": "^1.5.5",
-    "ink": "^2.7.1",
-    "ink-divider": "^2.0.1",
-    "ink-spinner": "^3.0.1",
-    "ink-table": "^2.0.1",
     "lodash": "^4.17.15",
-    "polished": "^3.5.1",
-    "react": "^16.13.1",
     "rimraf": "^3.0.2",
     "style-dictionary": "^2.8.3"
   },
   "devDependencies": {
-    "@babel/cli": "^7.8.4",
-    "@babel/core": "^7.9.0",
-    "@babel/plugin-transform-runtime": "^7.9.0",
-    "@babel/preset-env": "^7.9.0",
-    "@babel/preset-react": "^7.9.4",
-    "@babel/runtime": "^7.9.2",
-    "husky": "^4.2.3"
+    "eslint": "^6.8.0",
+    "eslint-config-prettier": "^6.10.1",
+    "eslint-plugin-prettier": "^3.1.2",
+    "husky": "^4.2.3",
+    "prettier": "^2.0.2"
   },
   "husky": {
     "hooks": {
       "pre-commit": "npm run prebuild"
     }
   },
-  "babel": {
-    "presets": [
-      "@babel/preset-react",
-      [
-        "@babel/preset-env",
-        {
-          "modules": "cjs"
-        }
-      ]
-    ],
+  "eslintConfig": {
     "plugins": [
-      "@babel/plugin-transform-runtime"
-    ]
+      "prettier"
+    ],
+    "rules": {
+      "prettier/prettier": "error",
+      "no-unused-vars": "error"
+    },
+    "extends": [
+      "plugin:prettier/recommended",
+      "prettier/standard"
+    ],
+    "env": {
+      "es6": true,
+      "node": true,
+      "commonjs": true
+    },
+    "parserOptions": {
+      "sourceType": "module",
+      "ecmaVersion": 2018
+    }
   }
 }
