@@ -17,7 +17,7 @@ async function getFile(config) {
   }
 
   if (!boards.length) {
-    throw [new Error(messages.boardsAreEmpty)];
+    return [new Error(messages.boardsAreEmpty)];
   }
 
   try {

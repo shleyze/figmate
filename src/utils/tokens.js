@@ -86,7 +86,7 @@ function parseNode(node, options, handler) {
 
             if (isEqualTypes && isTypeFill) {
               handler &&
-                handler(name, { description, styles: { color: rgbaColor } });
+                handler(name, { description, styles: { value: rgbaColor } });
             }
 
             if (isEqualTypes && isTypeText && style) {
@@ -130,7 +130,7 @@ function parseNode(node, options, handler) {
               handler &&
                 handler(name, {
                   description,
-                  styles: { "box-shadow": formatShadowToCSS(properties) },
+                  styles: { value: formatShadowToCSS(properties) },
                 });
             }
           }
@@ -147,7 +147,7 @@ function parseNode(node, options, handler) {
       const { absoluteBoundingBox } = node;
       const { height } = absoluteBoundingBox;
 
-      handler && handler(name, { styles: { height: `${height}px` } });
+      handler && handler(name, { styles: { value: `${height}px` } });
     }
 
     if (tokenTypes[type] && type === "radius") {
@@ -166,7 +166,7 @@ function parseNode(node, options, handler) {
         radius = "50%";
       }
 
-      handler && handler(name, { styles: { "border-radius": radius } });
+      handler && handler(name, { styles: { value: radius } });
     }
   }
 

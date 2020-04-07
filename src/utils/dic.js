@@ -69,10 +69,18 @@ function transform(arr) {
 
         if (isLast) {
           acc[item] = Object.entries(styles).reduce((acc, [key, value]) => {
-            acc[key] = {
-              value,
-              ...(description && { comment: description }),
-            };
+            if (key === "value") {
+              acc["value"] = value;
+              if (description) {
+                acc["comment"] = description;
+              }
+            } else {
+              acc[key] = {
+                value,
+                ...(description && { comment: description }),
+              };
+            }
+
             return acc;
           }, {});
         } else {
