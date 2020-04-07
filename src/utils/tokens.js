@@ -152,7 +152,7 @@ function parseNode(node, options, handler) {
 
     if (tokenTypes[type] && type === "radius") {
       const { cornerRadius, rectangleCornerRadii, absoluteBoundingBox } = node;
-      const { width, height } = absoluteBoundingBox;
+      const { width } = absoluteBoundingBox;
       const isEqualRadius = [...new Set(rectangleCornerRadii)].length === 1;
       let radius = null;
 
@@ -162,7 +162,7 @@ function parseNode(node, options, handler) {
         radius = `${rectangleCornerRadii.join("px ")}px`;
       }
 
-      if (isEqualRadius && width + height === cornerRadius) {
+      if (isEqualRadius && width / 2 <= cornerRadius) {
         radius = "50%";
       }
 
