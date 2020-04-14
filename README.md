@@ -85,7 +85,9 @@ As a path you can specify the page or group and it's possible to be nested as yo
 | Type         | Description                                             |
 |--------------|---------------------------------------------------------|
 | style/text   | Text styles                                             |
+| text         | Raw text styles                                         |
 | style/fill   | Color styles                                            |
+| fill         | Raw color styles                                        |
 | style/shadow | Box-shadow styles                                       |
 | space        | Spacer or indents, name and height are taken from shape |
 | radius       | Border-radius, name and radius are taken from shape     |

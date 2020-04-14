@@ -2,11 +2,15 @@ const messages = require("./messages");
 
 const tokenTypes = {
   "style/text": "text",
+  text: "TEXT",
   "style/fill": "fill",
+  fill: "fill",
   "style/shadow": "DROP_SHADOW",
   space: true,
   radius: true,
 };
+
+const rawNodeTypes = ["RECTANGLE", "VECTOR"];
 
 function getColorValue(color) {
   // Convert color to web rgba format
@@ -57,7 +61,7 @@ function parseNode(node, options, handler) {
   if (!node) {
     return;
   }
-  const { styles, type, nodeType = "RECTANGLE" } = options;
+  const { styles, type } = options;
 
   // Check node stuff
   if (node.styles) {
@@ -142,8 +146,8 @@ function parseNode(node, options, handler) {
   }
 
   // Check other params
-  if (node.type === nodeType) {
-    const { name } = node;
+  if (rawNodeTypes.includes(node.type)) {
+    const { name, styles } = node;
 
     if (tokenTypes[type] && type === "space") {
       const { absoluteBoundingBox } = node;
@@ -169,6 +173,24 @@ function parseNode(node, options, handler) {
       }
 
       handler && handler(name, { styles: { value: radius } });
+    }
+
+    if (tokenTypes[type] && type === "fill") {
+      if (!styles || !styles[tokenTypes["style/fill"]]) {
+        const { fills } = node;
+        const { color } = fills[0];
+        const rgbaColor = getColorValue(color);
+
+        handler && handler(name, { styles: { value: rgbaColor } });
+      }
+    }
+  }
+
+  if (node.type === tokenTypes[type] && type === "text") {
+    const { style, styles, name } = node;
+
+    if (!styles || !styles[tokenTypes["style/text"]]) {
+      handler && handler(name, { styles: formatFontToCSS(style) });
     }
   }
 
