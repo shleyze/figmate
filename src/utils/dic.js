@@ -1,5 +1,7 @@
 const merge = require("lodash/merge");
-const { writeFile } = require("./files");
+const { get: getConfig } = require("./config");
+const { get: getRawTokens } = require("./tokens");
+const { writeFile, deleteFolder } = require("./files");
 
 function addCallbackActionToPlatforms(obj, actionName) {
   return Object.entries(obj).reduce((acc, [key, item]) => {
@@ -16,11 +18,17 @@ function addCallbackActionToPlatforms(obj, actionName) {
   }, {});
 }
 
-async function buildTokens(dic, config) {
-  const { tempFolder, platforms: defaultPlatforms } = config;
-  const DIC_TEMP_FILE = `${tempFolder}/dic.json`;
+const getId = () => `f${(~~(Math.random() * 1e8)).toString(16)}`;
 
-  await writeFile(JSON.stringify(dic, null, 2), DIC_TEMP_FILE);
+async function buildTokens(file, config) {
+  const CONFIG = await getConfig(config);
+  const RAW_TOKENS = getRawTokens(file, CONFIG);
+  const DIC_TOKENS = transform(RAW_TOKENS);
+
+  const { tempFolder, platforms: defaultPlatforms } = CONFIG;
+  const DIC_TEMP_FILE = `${tempFolder}/dic_${getId()}.json`;
+
+  await writeFile(JSON.stringify(DIC_TOKENS, null, 2), DIC_TEMP_FILE);
 
   return new Promise((resolve) => {
     try {
@@ -44,7 +52,7 @@ async function buildTokens(dic, config) {
             callbackActionCounter === Object.keys(platforms).length - 1;
 
           if (shouldFireCallback) {
-            resolve([null]);
+            resolve();
           } else {
             callbackActionCounter++;
           }
@@ -53,8 +61,10 @@ async function buildTokens(dic, config) {
       });
 
       StyleDictionary.buildAllPlatforms();
+
+      deleteFolder(DIC_TEMP_FILE);
     } catch (error) {
-      resolve([error]);
+      throw new Error(error);
     }
   });
 }

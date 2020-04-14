@@ -1,35 +1,23 @@
 #!/usr/bin/env node
-const log = require("./utils/log");
-const config = require("./utils/config");
 const figmaApi = require("./utils/figma");
-const tokens = require("./utils/tokens");
 const dic = require("./utils/dic");
-const files = require("./utils/files");
 
 const isCLI = require.main === module;
 
 async function figmate(moduleConfig) {
-  let ERR, FILE;
+  let FILE;
 
-  const CONFIG = await config.get(moduleConfig);
-
-  [ERR, FILE] = await figmaApi.getFile(CONFIG);
-
-  if (ERR) {
-    log.error(ERR["message"]);
-    return [ERR];
+  try {
+    FILE = await figmaApi.getFile(moduleConfig);
+  } catch (e) {
+    throw new Error(e);
   }
 
-  const RAW_TOKENS = tokens.get(FILE, CONFIG);
-  const DIC_TOKENS = dic.transform(RAW_TOKENS);
-  [ERR] = await dic.buildTokens(DIC_TOKENS, CONFIG);
-
-  if (ERR) {
-    log.error(ERR["message"]);
-    return [ERR];
+  try {
+    await dic.buildTokens(FILE, moduleConfig);
+  } catch (e) {
+    throw new Error(e);
   }
-
-  return await files.deleteFolder(CONFIG["tempFolder"]);
 }
 
 if (isCLI) {
@@ -37,3 +25,5 @@ if (isCLI) {
 }
 
 module.exports = figmate;
+module.exports.getFigmaFile = figmaApi.getFile;
+module.exports.buildTokens = dic.buildTokens;

@@ -1,23 +1,21 @@
 const axios = require("axios");
 const log = require("./log");
 const messages = require("./messages");
+const { get: getConfig } = require("./config");
 
 const BASE_URL = "https://api.figma.com";
 const API_VER = "v1";
 
 async function getFile(config) {
-  const { token, fileId, boards } = config;
+  const CONFIG = await getConfig(config);
+  const { token, fileId } = CONFIG;
 
   if (!token) {
-    return [new Error(messages.tokenNotFound)];
+    throw new Error(messages.tokenNotFound);
   }
 
   if (!fileId) {
-    return [new Error(messages.fileIdNotFound)];
-  }
-
-  if (!boards.length) {
-    return [new Error(messages.boardsAreEmpty)];
+    throw new Error(messages.fileIdNotFound);
   }
 
   try {
@@ -29,10 +27,11 @@ async function getFile(config) {
 
     log.success(messages.fileLoaded);
 
-    return [null, res["data"]];
+    return res["data"];
   } catch (error) {
     const { response: { data: { err } = {} } = {} } = error;
-    return [{ message: err || error }];
+
+    throw new Error(err || error);
   }
 }
 

@@ -17,8 +17,6 @@ async function get(config) {
     token: (ENV_CONFIG && ENV_CONFIG.FIGMA_TOKEN) || null,
     fileId: (ENV_CONFIG && ENV_CONFIG.FIGMA_FILE_ID) || null,
     tempFolder: path.join(path.resolve(__dirname, "../../"), "temp"),
-    boards: [],
-    platforms: {},
   };
 
   return merge(
