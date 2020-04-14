@@ -1,3 +1,5 @@
+const messages = require("./messages");
+
 const tokenTypes = {
   "style/text": "text",
   "style/fill": "fill",
@@ -201,6 +203,10 @@ function getNode(path, node) {
 function get(FILE, CONFIG) {
   const { document, styles } = FILE;
   const { boards } = CONFIG;
+
+  if (!boards || !boards.length) {
+    throw new Error(messages.boardsAreEmpty);
+  }
 
   return boards
     .map((board) => {

@@ -55,7 +55,7 @@ Figmate({
 
 ### Token and File id (:string)
 
-**Thease options are required**
+**Tease options are required**
 
 [Token](https://www.figma.com/developers/api#access-tokens) and file id can be placed in .env file with keys: 
 
@@ -98,5 +98,57 @@ Figmate is using [Style dictionary](https://amzn.github.io/style-dictionary/#/co
 platforms: {
   ...
 }
+```
+
+## Utils
+
+Tease utils helps if you have themes in one file and you don't want to request the same file for every theme 
+
+### getFigmaFile(:configuration object)
+
+`const { getFigmaFile } = require('figmate')`
+
+Async function to get Figma file and then parse it as you need. You can provide config as first argument.
+
+
+### buildTokens(:figmaFile JSON, :configuration object)
+
+`const { buildTokens } = require('figmate')`
+
+Async function to parse Figma file. You need to provide file as first argument and config as second.
+
+### Example to use utils
+
+```
+const { getFigmaFile, buildTokens } = require('figmate')
+
+const themes = ['alpha', 'betta', 'gamma']
+
+async function generateTokens(file) {
+  for (const theme of themes) {
+    await buildTokens(file, {
+      boards: [
+        {
+          path: `Tokens/${theme}`,
+          type: 'style/text',
+        },
+      ],
+      platforms: {
+        scss: {
+          transformGroup: 'scss',
+          buildPath: `${theme}/`,
+          files: [
+            {
+              destination: `${theme}_tokens.scss`,
+              format: 'scss/variables',
+            },
+          ],
+        },
+      },
+    })
+  }
+}
+
+getFigmaFile().then(generateTokens)
 ```
 
